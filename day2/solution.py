@@ -1,11 +1,14 @@
 from pathlib import Path
 
 def is_repeated(id):
-    return any(
-        id == id[:size] * (len(id) // size)
-        for size in range(1, len(id) // 2 + 1)
-        if len(id) % size == 0
-    )
+    for size in range(1, len(id) // 2 + 1):
+        if len(id) % size != 0:
+            continue
+        pattern = id[:size]
+        times = len(id) // size
+        if pattern * times == id:
+            return True
+    return False
 
 
 def find_invalids(line):

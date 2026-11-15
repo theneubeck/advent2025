@@ -1,15 +1,16 @@
 from pathlib import Path
 
+def is_repeated(id):
+    return any(
+        id == id[:size] * (len(id) // size)
+        for size in range(1, len(id) // 2 + 1)
+        if len(id) % size == 0
+    )
+
+
 def find_invalids(line):
-    invalids = []
     start, end = line.split("-")
-    for n in range(int(start), int(end) + 1):
-        id = str(n)
-        if len(id) % 2 != 0: continue
-        first, second = id[:len(id) // 2], id[len(id) // 2:]
-        if first == second or id[0] == "0":
-            invalids.append(int(id))
-    return invalids
+    return [n for n in range(int(start), int(end) + 1) if is_repeated(str(n))]
 
 
 def main(data: str):

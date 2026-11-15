@@ -1,4 +1,4 @@
-import sys
+from pathlib import Path
 
 START = 50
 CLICKS = 100
@@ -25,6 +25,9 @@ def main(str):
 
     return result.count(0)
 
+def run():
+    print(main(Path(__file__).with_name("input.txt").read_text()))
+
+
 if __name__ == "__main__":
-    data = sys.stdin.read()
-    print(main(data))
+    run()

@@ -1,6 +1,6 @@
 import pytest
 
-from solution import get_the_number, main
+from day1.solution import get_the_number, main
 
 EXAMPLE = """\
 L68

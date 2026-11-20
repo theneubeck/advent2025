@@ -13,10 +13,11 @@ pythonpath = ["."]
 [project.scripts]
 day1 = "day1.solution:run"
 day2 = "day2.solution:run"
+day3 = "day3.solution:run"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["day1", "day2"]
+packages = ["day1", "day2", "day3"]

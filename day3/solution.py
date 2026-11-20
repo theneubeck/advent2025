@@ -36,19 +36,20 @@ def largest_voltage_version2(bank: str) -> int:
     if len(bank) == 12:
         return int(bank)
 
-
     start = 0
     digits = []
-    for k in range(12):
-        end = len(bank) - (12 - k) + 1  # exclusive slice end
-        d = max(bank[start:end])
-        digits.append(d)
-        start = bank.index(d, start) + 1
+
+    for i in range(12):
+        end = len(bank) - (12 - i) + 1
+        window = bank[start:end]
+        best = max(window)
+        digits.append(best)
+        start = bank.index(best, start) + 1
 
     return int("".join(digits))
 
 
-def main(data: str, version=1):
+def main(data: str, version=2):
     if version == 1:
         return sum(map(largest_voltage_version1, data.split()))
     else:

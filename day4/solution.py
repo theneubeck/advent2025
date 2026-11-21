@@ -21,7 +21,6 @@ def accessible_papers1(pre: list[int], cur: list[int], nxt: list[int]) -> int:
             count += 1 if sum(positions) < threashold else 0
     return count
 
-
 def accessible_papers2(data: str) -> int:
     raise NotImplementedError
 
@@ -29,7 +28,7 @@ def accessible_papers2(data: str) -> int:
 def transform(line:str):
     return [int(c == "@") for c in line]
 
-def main(data: str, version=1):
+def main_lists(data: str, version=1):
     rows = [transform(r) for r in data.split()]
     padded = [[]] + rows + [[]]
     number = 0
@@ -41,5 +40,32 @@ def main(data: str, version=1):
 
     return number
 
+
+def main_grid(data: str, version=1):
+    rows = data.split()
+    grid = {
+        (r, c): int(ch == "@")
+        for r, line in enumerate(rows)
+        for c, ch in enumerate(line)
+    }
+    count = 0
+
+    for (x, y), value in grid.items():
+        if value:
+            positions = [
+                grid.get((x-i, y-j), 0)
+                for i in range(-1,2)
+                for j in range(-1,2)
+            ]
+            count += 1 if sum(positions) < threashold + 1 else 0
+
+    return count
+
+def main(*args, **kwars):
+    return main_grid(*args, **kwars)
+
 def run():
     print(main(Path(__file__).with_name("input.txt").read_text()))
+
+if __name__ == "__main__":
+    run()

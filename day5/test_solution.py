@@ -1,6 +1,6 @@
 import pytest
 
-from day5.solution import main, parse_ranges, is_fresh
+from day5.solution import main, parse_ranges, is_fresh, is_inclusive, merge_ranges
 
 EXAMPLE = """\
 3-5
@@ -75,6 +75,73 @@ def test_is_fresh(raw, ingredient, expected):
     assert is_fresh(parse_ranges(raw), ingredient) == expected
 
 
+# Two inclusive ranges overlap if they share at least one ID.
+# Pairs come sorted, so pair1 never starts after pair2.
+@pytest.mark.parametrize(
+    "pair1, pair2, expected",
+    [
+        pytest.param((1, 5), (3, 8), True, id="partial-overlap"),
+        pytest.param((1, 3), (3, 6), True, id="sharing-an-end"),
+        pytest.param((1, 10), (3, 4), True, id="second-inside-first"),
+        pytest.param((1, 3), (1, 3), True, id="identical"),
+        pytest.param((1, 3), (1, 8), True, id="same-start"),
+        pytest.param((1, 8), (5, 8), True, id="same-end"),
+        pytest.param((7, 7), (7, 7), True, id="same-single-point"),
+        pytest.param((1, 10), (7, 7), True, id="range-around-point"),
+        pytest.param((1, 3), (4, 6), False, id="adjacent"),
+        pytest.param((1, 3), (5, 6), False, id="gap"),
+        pytest.param((7, 7), (8, 8), False, id="neighbouring-points"),
+        pytest.param(
+            (10**12, 2 * 10**12), (2 * 10**12, 3 * 10**12), True, id="huge-sharing-an-end"
+        ),
+        pytest.param(
+            (10**12, 2 * 10**12), (2 * 10**12 + 1, 3 * 10**12), False, id="huge-adjacent"
+        ),
+    ],
+)
+def test_is_inclusive(pair1, pair2, expected):
+    assert is_inclusive(pair1, pair2) == expected
+
+
+# Input is sorted, as count_ids sorts before merging.
+# Adjacent ranges (1-3, 4-6) share no ID, so they stay separate.
+@pytest.mark.parametrize(
+    "ranges, expected",
+    [
+        pytest.param([], [], id="empty"),
+        pytest.param([(3, 5)], [(3, 5)], id="single-range"),
+        pytest.param(
+            [(3, 5), (10, 14), (12, 18), (16, 20)],
+            [(3, 5), (10, 20)],
+            id="example-sorted",
+        ),
+        pytest.param([(1, 3), (5, 6)], [(1, 3), (5, 6)], id="gap-not-merged"),
+        pytest.param([(1, 3), (4, 6)], [(1, 3), (4, 6)], id="adjacent-not-merged"),
+        pytest.param([(1, 5), (3, 8)], [(1, 8)], id="partial-overlap"),
+        pytest.param([(1, 3), (3, 6)], [(1, 6)], id="sharing-an-end"),
+        pytest.param([(1, 10), (3, 4)], [(1, 10)], id="second-inside-first"),
+        pytest.param([(1, 10), (3, 4), (9, 12)], [(1, 12)], id="keeps-widest-end"),
+        pytest.param([(1, 3), (1, 3)], [(1, 3)], id="duplicates"),
+        pytest.param([(1, 3), (2, 5), (4, 8)], [(1, 8)], id="chain-of-overlaps"),
+        pytest.param(
+            [(1, 3), (2, 4), (10, 12), (11, 15), (20, 20)],
+            [(1, 4), (10, 15), (20, 20)],
+            id="several-groups",
+        ),
+        pytest.param([(7, 7), (7, 7), (8, 8)], [(7, 7), (8, 8)], id="single-points"),
+        pytest.param([(0, 2)], [(0, 2)], id="starts-at-zero"),
+        pytest.param([(0, 0), (5, 6)], [(0, 0), (5, 6)], id="zero-point-range"),
+        pytest.param(
+            [(10**12, 2 * 10**12), (2 * 10**12, 3 * 10**12)],
+            [(10**12, 3 * 10**12)],
+            id="huge-numbers",
+        ),
+    ],
+)
+def test_merge_ranges(ranges, expected):
+    assert merge_ranges(ranges) == expected
+
+
 @pytest.mark.parametrize(
     "data, expected",
     [
@@ -101,7 +168,22 @@ def test_main(data, expected):
 @pytest.mark.parametrize(
     "data, expected",
     [
-        # pytest.param(EXAMPLE, ..., id="example"),
+        pytest.param(EXAMPLE, 14, id="example"),
+        pytest.param(EXAMPLE.rstrip("\n"), 14, id="no-trailing-newline"),
+        pytest.param("3-5\n\n1\n", 3, id="single-range"),
+        pytest.param("7-7\n\n1\n", 1, id="single-point-range"),
+        pytest.param("3-5\n\n", 3, id="no-ingredients"),
+        pytest.param("3-5\n\n100\n200\n", 3, id="ingredient-ids-ignored"),
+        pytest.param("1-5\n3-8\n\n1\n", 8, id="overlapping"),
+        pytest.param("1-3\n1-3\n\n1\n", 3, id="duplicate-ranges"),
+        pytest.param("1-10\n3-4\n\n1\n", 10, id="range-inside-another"),
+        pytest.param("1-3\n4-6\n\n1\n", 6, id="adjacent-ranges"),
+        pytest.param("1-3\n3-6\n\n1\n", 6, id="sharing-an-end"),
+        pytest.param("1-3\n5-6\n\n1\n", 5, id="gap-between-ranges"),
+        pytest.param("10-12\n1-2\n\n1\n", 5, id="unsorted-ranges"),
+        pytest.param("1-3\n2-5\n4-8\n\n1\n", 8, id="chain-of-overlaps"),
+        pytest.param("1-2\n5-6\n2-5\n\n1\n", 6, id="later-range-bridges-gap"),
+        pytest.param("1000000000000-1999999999999\n\n1\n", 10**12, id="huge-range"),
     ],
 )
 def test_main_v2(data, expected):

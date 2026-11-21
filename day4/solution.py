@@ -40,16 +40,12 @@ def main_lists(data: str, version=1):
 
     return number
 
+def count_version_1(grid):
+    return len(get_positions(grid))
 
-def main_grid(data: str, version=1):
-    rows = data.split()
-    grid = {
-        (r, c): int(ch == "@")
-        for r, line in enumerate(rows)
-        for c, ch in enumerate(line)
-    }
-    count = 0
 
+def get_positions(grid):
+    coords = []
     for (x, y), value in grid.items():
         if value:
             positions = [
@@ -57,9 +53,33 @@ def main_grid(data: str, version=1):
                 for i in range(-1,2)
                 for j in range(-1,2)
             ]
-            count += 1 if sum(positions) < threashold + 1 else 0
+            if sum(positions) < threashold + 1:
+                coords.append((x,y))
+    return coords
+
+def count_version_2(grid):
+    count = 0
+    positions = get_positions(grid)
+    count += len(positions)
+    while len(positions) > 0:
+        for key in positions:
+            grid[key] = 0
+        positions = get_positions(grid)
+        count += len(positions)
 
     return count
+
+def main_grid(data: str, version=2):
+    rows = data.split()
+    grid = {
+        (r, c): int(ch == "@")
+        for r, line in enumerate(rows)
+        for c, ch in enumerate(line)
+    }
+    if version == 1:
+        return count_version_1(grid)
+
+    return count_version_2(grid)
 
 def main(*args, **kwars):
     return main_grid(*args, **kwars)

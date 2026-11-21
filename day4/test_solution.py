@@ -1,6 +1,6 @@
 import pytest
 
-from day4.solution import main, accessible_papers1, accessible_papers2
+from day4.solution import main, accessible_papers1, accessible_papers2, get_positions
 
 EXAMPLE = """\
 ..@@.@@@@.
@@ -61,6 +61,159 @@ def test_accessible_papers1(pre, cur, nxt, expected):
 @pytest.mark.parametrize(
     "data, expected",
     [
+        # pytest.param(..., ..., id="..."),
+    ],
+)
+def test_accessible_papers2(data, expected):
+    assert accessible_papers2(data) == expected
+
+
+# Each step of the part 2 example: "x" marks the rolls that get removed.
+# Before the step those cells are rolls ("@"), so the input grid is the
+# picture with x -> @, and the expected positions are where the x's are.
+REMOVAL_STEPS = [
+    (13, """\
+..xx.xx@x.
+x@@.@.@.@@
+@@@@@.x.@@
+@.@@@@..@.
+x@.@@@@.@x
+.@@@@@@@.@
+.@.@.@.@@@
+x.@@@.@@@@
+.@@@@@@@@.
+x.x.@@@.x.
+"""),
+    (12, """\
+.......x..
+.@@.x.x.@x
+x@@@@...@@
+x.@@@@..x.
+.@.@@@@.x.
+.x@@@@@@.x
+.x.@.@.@@@
+..@@@.@@@@
+.x@@@@@@@.
+....@@@...
+"""),
+    (7, """\
+..........
+.x@.....x.
+.@@@@...xx
+..@@@@....
+.x.@@@@...
+..@@@@@@..
+...@.@.@@x
+..@@@.@@@@
+..x@@@@@@.
+....@@@...
+"""),
+    (5, """\
+..........
+..x.......
+.x@@@.....
+..@@@@....
+...@@@@...
+..x@@@@@..
+...@.@.@@.
+..x@@.@@@x
+...@@@@@@.
+....@@@...
+"""),
+    (2, """\
+..........
+..........
+..x@@.....
+..@@@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@x.
+....@@@...
+"""),
+    (1, """\
+..........
+..........
+...@@.....
+..x@@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@..
+....@@@...
+"""),
+    (1, """\
+..........
+..........
+...x@.....
+...@@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@..
+....@@@...
+"""),
+    (1, """\
+..........
+..........
+....x.....
+...@@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@..
+....@@@...
+"""),
+    (1, """\
+..........
+..........
+..........
+...x@@....
+...@@@@...
+...@@@@@..
+...@.@.@@.
+...@@.@@@.
+...@@@@@..
+....@@@...
+"""),
+]
+
+
+def grid_from(text: str) -> dict:
+    return {
+        (r, c): int(ch == "@")
+        for r, line in enumerate(text.split())
+        for c, ch in enumerate(line)
+    }
+
+
+def marked_positions(text: str) -> set:
+    return {
+        (r, c)
+        for r, line in enumerate(text.split())
+        for c, ch in enumerate(line)
+        if ch == "x"
+    }
+
+
+@pytest.mark.parametrize(
+    "count, marked",
+    [pytest.param(count, marked, id=f"step-{i}") for i, (count, marked) in enumerate(REMOVAL_STEPS, 1)],
+)
+def test_get_positions(count, marked):
+    grid = grid_from(marked.replace("x", "@"))
+    positions = get_positions(grid)
+    assert len(positions) == count
+    assert set(positions) == marked_positions(marked)
+
+
+@pytest.mark.parametrize(
+    "data, expected",
+    [
         pytest.param(EXAMPLE, 13, id="example"),
         pytest.param(EXAMPLE.rstrip("\n"), 13, id="no-trailing-newline"),
         pytest.param("", 0, id="empty-input"),
@@ -83,17 +236,21 @@ def test_main(data, expected):
 @pytest.mark.parametrize(
     "data, expected",
     [
-        # pytest.param(..., ..., id="..."),
-    ],
-)
-def test_accessible_papers2(data, expected):
-    assert accessible_papers2(data) == expected
-
-
-@pytest.mark.parametrize(
-    "data, expected",
-    [
-        # pytest.param(EXAMPLE, ..., id="example"),
+        pytest.param(EXAMPLE, 43, id="example"),
+        pytest.param(EXAMPLE.rstrip("\n"), 43, id="no-trailing-newline"),
+        pytest.param("", 0, id="empty-input"),
+        pytest.param(".", 0, id="single-empty-cell"),
+        pytest.param("@", 1, id="single-roll"),
+        pytest.param("...\n...\n...", 0, id="no-rolls"),
+        pytest.param("@@@", 3, id="single-row"),
+        pytest.param("@\n@\n@", 3, id="single-column"),
+        pytest.param("@" * 10, 10, id="long-single-row"),
+        pytest.param("@@\n@@", 4, id="2x2-full"),
+        pytest.param("@@@\n@@@", 6, id="2x3-full"),
+        pytest.param("@@@\n@@@\n@@@", 9, id="3x3-corners-then-arms-then-centre"),
+        pytest.param(".@.\n@@@\n.@.", 5, id="plus-arms-then-centre"),
+        pytest.param("@@@\n@.@\n@@@", 8, id="ring-corners-then-edges"),
+        pytest.param("@@@@@\n" * 5, 4, id="5x5-only-corners-then-stable"),
     ],
 )
 def test_main_v2(data, expected):

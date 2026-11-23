@@ -17,17 +17,46 @@ def apply(row, operator):
         raise ValueError(f"unknown operator: {operator!r}")
 
 
-def solve_version2(data: str) -> int:
-    raise NotImplementedError
+def solve_version2(columns: list[str]) -> int:
+    val = 0
+    for *numbers, op in columns:
+        print([apply(num, op) for num in numbers])
+        val += sum([apply(num, op) for num in numbers])
+    return val
 
+parse_int = lambda x: None if x == " " else int(x)
+
+def parse_data(data:str):
+    rows = data.splitlines()
+    operators = rows.pop().split()
+    num_rows = len(rows)
+    num_cols = max([len(r) for r in rows])
+    grid = {
+        (r, c): parse_int(ch)
+        for r, line in enumerate(rows)
+        for c, ch in enumerate(line)
+    }
+    bas = []
+    rr = []
+    for c in range(num_cols):
+        vals = [grid.get((r, c)) for r in range(num_rows) if grid.get((r, c))]
+        if vals:
+            rr.append(tuple(vals))
+        else:
+            bas.append((*rr, operators.pop(0), ))
+            rr = []
+
+    bas.append((*rr, operators.pop(0), ))
+
+    return bas
 
 def main(data: str, version=1):
-    rows = [line.split() for line in data.splitlines()]
-    columns = list(zip(*rows))
     if version == 1:
+        rows = [line.split() for line in data.splitlines()]
+        columns = list(zip(*rows))
         return solve_version1(columns)
     else:
-        return solve_version2(data)
+        return solve_version2(parse_data(data))
 
 
 def run():

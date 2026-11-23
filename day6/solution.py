@@ -18,13 +18,9 @@ def apply(row, operator):
 
 
 def solve_version2(columns: list[str]) -> int:
-    val = 0
-    for *numbers, op in columns:
-        print([apply(num, op) for num in numbers])
-        val += sum([apply(num, op) for num in numbers])
-    return val
+    return solve_version1(columns)
 
-parse_int = lambda x: None if x == " " else int(x)
+parse_int = lambda x: None if x == " " else x
 
 def parse_data(data:str):
     rows = data.splitlines()
@@ -41,16 +37,17 @@ def parse_data(data:str):
     for c in range(num_cols):
         vals = [grid.get((r, c)) for r in range(num_rows) if grid.get((r, c))]
         if vals:
-            rr.append(tuple(vals))
+            rr.append(int("".join(vals)))
         else:
+            rr.reverse()
             bas.append((*rr, operators.pop(0), ))
             rr = []
-
+    rr.reverse()
     bas.append((*rr, operators.pop(0), ))
-
+    bas.reverse()
     return bas
 
-def main(data: str, version=1):
+def main(data: str, version=2):
     if version == 1:
         rows = [line.split() for line in data.splitlines()]
         columns = list(zip(*rows))

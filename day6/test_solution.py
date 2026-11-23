@@ -9,13 +9,13 @@ EXAMPLE = """\
 *   +   *   +
 """
 
-# Each problem: one tuple of digits per character column (left to right,
-# digits top to bottom, blanks skipped), followed by the operator.
+# Problems read right-to-left, one column at a time: each character column
+# is one number (digits top to bottom, blanks skipped), followed by the operator.
 EXAMPLE_PARSED = [
-    ((1,), (2, 4), (3, 5, 6), "*"),
-    ((3, 6, 9), (2, 4, 8), (8,), "+"),
-    ((3, 2), (5, 8, 1), (1, 7, 5), "*"),
-    ((6, 2, 3), (4, 3, 1), (4,), "+"),
+    (4, 431, 623, "+"),
+    (175, 581, 32, "*"),
+    (8, 248, 369, "+"),
+    (356, 24, 1, "*"),
 ]
 
 
@@ -24,12 +24,12 @@ EXAMPLE_PARSED = [
     [
         pytest.param(EXAMPLE, EXAMPLE_PARSED, id="example"),
         pytest.param(EXAMPLE.rstrip("\n"), EXAMPLE_PARSED, id="no-trailing-newline"),
-        pytest.param("1\n2\n+\n", [((1, 2), '+')], id="single-digit-column"),
-        pytest.param("12\n34\n* \n", [((1, 3), (2, 4), '*')], id="single-problem-two-digit-columns"),
-        pytest.param("1 2\n3 4\n+ *\n", [((1, 3), '+'), ((2, 4), '*')], id="two-single-column-problems"),
-        pytest.param(" 7\n89\n+ \n", [((8,), (7, 9), '+')], id="blank-at-top-of-digit-column"),
-        pytest.param("78\n9 \n* \n", [((7, 9), (8,), '*')], id="blank-at-bottom-of-digit-column"),
-        pytest.param("12 3\n4  5\n*  +\n", [((1, 4), (2,), '*'), ((3, 5), '+')], id="operator-row-shorter-than-numbers"),
+        pytest.param("1\n2\n+\n", [(12, '+')], id="single-digit-column"),
+        pytest.param("12\n34\n* \n", [(24, 13, '*')], id="single-problem-two-digit-columns"),
+        pytest.param("1 2\n3 4\n+ *\n", [(24, '*'), (13, '+')], id="two-single-column-problems"),
+        pytest.param(" 7\n89\n+ \n", [(79, 8, '+')], id="blank-at-top-of-digit-column"),
+        pytest.param("78\n9 \n* \n", [(8, 79, '*')], id="blank-at-bottom-of-digit-column"),
+        pytest.param("12 3\n4  5\n*  +\n", [(35, '+'), (2, 14, '*')], id="operator-row-shorter-than-numbers"),
     ],
 )
 def test_parse_data(data, expected):
@@ -96,7 +96,19 @@ def test_solve_version1(columns, expected):
 @pytest.mark.parametrize(
     "data, expected",
     [
-        # pytest.param(..., ..., id="..."),
+        pytest.param(EXAMPLE_PARSED, 3263827, id="example"),
+        # the example's four problems, one at a time (right to left)
+        pytest.param([EXAMPLE_PARSED[0]], 4 + 431 + 623, id="example-rightmost"),
+        pytest.param([EXAMPLE_PARSED[1]], 175 * 581 * 32, id="example-second-from-right"),
+        pytest.param([EXAMPLE_PARSED[2]], 8 + 248 + 369, id="example-third-from-right"),
+        pytest.param([EXAMPLE_PARSED[3]], 356 * 24 * 1, id="example-leftmost"),
+        # edge cases (same shapes as test_parse_data)
+        pytest.param([(12, "+")], 12, id="single-digit-column"),
+        pytest.param([(24, 13, "*")], 24 * 13, id="single-problem-two-digit-columns"),
+        pytest.param([(24, "*"), (13, "+")], 24 + 13, id="two-single-column-problems"),
+        pytest.param([(79, 8, "+")], 79 + 8, id="blank-at-top-of-digit-column"),
+        pytest.param([(8, 79, "*")], 8 * 79, id="blank-at-bottom-of-digit-column"),
+        pytest.param([], 0, id="no-problems"),
     ],
 )
 def test_solve_version2(data, expected):

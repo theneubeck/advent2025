@@ -17,10 +17,11 @@ day3 = "day3.solution:run"
 day4 = "day4.solution:run"
 day5 = "day5.solution:run"
 day6 = "day6.solution:run"
+day7 = "day7.solution:run"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["day1", "day2", "day3", "day4", "day5", "day6"]
+packages = ["day1", "day2", "day3", "day4", "day5", "day6", "day7"]

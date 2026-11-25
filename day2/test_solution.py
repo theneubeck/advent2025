@@ -2,13 +2,16 @@ import pytest
 
 from day2.solution import find_invalids, main
 
-EXAMPLE = "".join("""11-22,95-115,998-1012,1188511880-1188511890,222220-222224,
+EXAMPLE = "".join(
+    """11-22,95-115,998-1012,1188511880-1188511890,222220-222224,
 1698522-1698528,446443-446449,38593856-38593862,565653-565659,
-824824821-824824827,2121212118-2121212124""".split())
+824824821-824824827,2121212118-2121212124""".split()
+)
 
 
 # def test_example():
 #     assert main(EXAMPLE) is None
+
 
 @pytest.mark.parametrize(
     "id_range, expected",
@@ -29,6 +32,7 @@ EXAMPLE = "".join("""11-22,95-115,998-1012,1188511880-1188511890,222220-222224,
 def test_find_invalids(id_range, expected):
     assert find_invalids(id_range) == expected
 
+
 @pytest.mark.parametrize(
     "data, expected",
     [
@@ -47,4 +51,3 @@ def test_find_invalids(id_range, expected):
 )
 def test_main(data, expected):
     assert main(data) == expected
-

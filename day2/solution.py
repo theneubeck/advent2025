@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def is_repeated(id):
     for size in range(1, len(id) // 2 + 1):
         if len(id) % size != 0:
@@ -17,7 +18,7 @@ def find_invalids(line):
 
 
 def main(data: str):
-    lines  = data.split(",")
+    lines = data.split(",")
     invalids = []
     for line in lines:
         if invalid := find_invalids(line):

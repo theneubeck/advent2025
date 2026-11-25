@@ -39,3 +39,12 @@ uv run pytest day4                 # one day
 uv run pytest day4 -k test_main_v2 # one test function
 uv run pytest day4 -v              # list each case by its id
 ```
+
+## Formatting and linting
+
+[Ruff](https://docs.astral.sh/ruff/) handles both (Black-compatible formatting, PEP 8 checks, import sorting). In VS Code it runs on save via the Ruff extension (see `.vscode/`). From the terminal:
+
+```sh
+uv run ruff format .       # format
+uv run ruff check . --fix  # lint and auto-fix
+```

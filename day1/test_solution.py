@@ -16,7 +16,6 @@ L82
 """
 
 
-
 @pytest.mark.parametrize(
     "current, action, expected",
     [
@@ -34,6 +33,7 @@ L82
 )
 def test_get_the_number(current, action, expected):
     assert get_the_number(current, action)[0] == expected
+
 
 @pytest.mark.parametrize(
     "current, action, expected",
@@ -73,6 +73,7 @@ def test_get_the_number_zero_count(current, action, expected):
 )
 def test_main(data, expected):
     assert main(data, version=1) == expected
+
 
 @pytest.mark.parametrize(
     "data, expected",

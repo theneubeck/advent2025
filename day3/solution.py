@@ -6,7 +6,7 @@ def largest_voltage_version_1_slow(input: str):
     input_len = len(input)
     for i in range(input_len):
         d = input[i]
-        for e in range(i+1, input_len):
+        for e in range(i + 1, input_len):
             e = input[e]
             num = int(d + e)
             if num > largest:
@@ -24,7 +24,7 @@ def largest_voltage_version1(bank: str) -> int:
     i = bank.index(first)
 
     # second digit: best candidate after i
-    second = max(bank[i + 1:])
+    second = max(bank[i + 1 :])
 
     return int(first + second)
 

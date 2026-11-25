@@ -2,6 +2,7 @@ from pathlib import Path
 
 threashold = 4
 
+
 def val(row: list[int], idx: int) -> int:
     if idx < 0:
         return 0
@@ -9,24 +10,33 @@ def val(row: list[int], idx: int) -> int:
         return 0
     return row[idx]
 
+
 def accessible_papers1(pre: list[int], cur: list[int], nxt: list[int]) -> int:
     count = 0
     for i in range(len(cur)):
         if val(cur, i) == 1:
             positions = [
-                val(pre, i-1), val(pre, i), val(pre, i+1),
-                val(cur, i-1), 0,           val(cur, i+1),
-                val(nxt, i-1), val(nxt, i), val(nxt, i+1),
+                val(pre, i - 1),
+                val(pre, i),
+                val(pre, i + 1),
+                val(cur, i - 1),
+                0,
+                val(cur, i + 1),
+                val(nxt, i - 1),
+                val(nxt, i),
+                val(nxt, i + 1),
             ]
             count += 1 if sum(positions) < threashold else 0
     return count
+
 
 def accessible_papers2(data: str) -> int:
     raise NotImplementedError
 
 
-def transform(line:str):
+def transform(line: str):
     return [int(c == "@") for c in line]
+
 
 def main_lists(data: str, version=1):
     rows = [transform(r) for r in data.split()]
@@ -40,6 +50,7 @@ def main_lists(data: str, version=1):
 
     return number
 
+
 def count_version_1(grid):
     return len(get_positions(grid))
 
@@ -49,13 +60,12 @@ def get_positions(grid):
     for (x, y), value in grid.items():
         if value:
             positions = [
-                grid.get((x-i, y-j), 0)
-                for i in range(-1,2)
-                for j in range(-1,2)
+                grid.get((x - i, y - j), 0) for i in range(-1, 2) for j in range(-1, 2)
             ]
             if sum(positions) < threashold + 1:
-                coords.append((x,y))
+                coords.append((x, y))
     return coords
+
 
 def count_version_2(grid):
     count = 0
@@ -69,6 +79,7 @@ def count_version_2(grid):
 
     return count
 
+
 def main_grid(data: str, version=2):
     rows = data.split()
     grid = {
@@ -81,11 +92,14 @@ def main_grid(data: str, version=2):
 
     return count_version_2(grid)
 
+
 def main(*args, **kwars):
     return main_grid(*args, **kwars)
 
+
 def run():
     print(main(Path(__file__).with_name("input.txt").read_text()))
+
 
 if __name__ == "__main__":
     run()

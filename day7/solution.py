@@ -2,8 +2,7 @@ from functools import lru_cache
 from pathlib import Path
 
 
-
-def parse_data(data:str):
+def parse_data(data: str):
     rows = data.splitlines()
     grid = []
     for x, row in enumerate(rows):
@@ -13,7 +12,6 @@ def parse_data(data:str):
             grid[x].append(char)
 
     return grid
-
 
 
 def play(grid, version=1):
@@ -37,13 +35,11 @@ def build_paths(grid):
             return 0
 
         elif grid[x][y] == "^":
-            return paths(x+1, y+1) + paths(x+1,y-1)
+            return paths(x + 1, y + 1) + paths(x + 1, y - 1)
 
-        return paths(x+1, y)
+        return paths(x + 1, y)
 
     return paths
-
-
 
 
 def split(grid, x, y):
@@ -51,15 +47,16 @@ def split(grid, x, y):
         return 0
     if y < 0 or y > len(grid[x]) - 1:
         return 0
-    if (grid[x][y] == "|"):
+    if grid[x][y] == "|":
         return 0
 
     elif grid[x][y] == "^":
-        grid[x][y] = "|" # mark as visited
-        return split(grid, x+1, y+1) + split(grid, x+1,y-1) + 1
+        grid[x][y] = "|"  # mark as visited
+        return split(grid, x + 1, y + 1) + split(grid, x + 1, y - 1) + 1
 
-    grid[x][y] = "|" # mark as visited
-    return split(grid, x+1, y)
+    grid[x][y] = "|"  # mark as visited
+    return split(grid, x + 1, y)
+
 
 def main(data: str, version=2):
     grid = parse_data(data)

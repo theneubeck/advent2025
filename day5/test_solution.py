@@ -1,6 +1,6 @@
 import pytest
 
-from day5.solution import main, parse_ranges, is_fresh, is_inclusive, merge_ranges
+from day5.solution import is_fresh, is_inclusive, main, merge_ranges, parse_ranges
 
 EXAMPLE = """\
 3-5
@@ -23,7 +23,9 @@ EXAMPLE_RANGES = "3-5\n10-14\n16-20\n12-18"
 @pytest.mark.parametrize(
     "raw, expected",
     [
-        pytest.param(EXAMPLE_RANGES, [(3, 5), (10, 14), (16, 20), (12, 18)], id="example"),
+        pytest.param(
+            EXAMPLE_RANGES, [(3, 5), (10, 14), (16, 20), (12, 18)], id="example"
+        ),
         pytest.param("3-5", [(3, 5)], id="single-range"),
         pytest.param("3-5\n", [(3, 5)], id="trailing-newline"),
         pytest.param("7-7", [(7, 7)], id="single-point-range"),
@@ -67,8 +69,12 @@ def test_parse_ranges(raw, expected):
         pytest.param("7-7", 7, True, id="single-point-range"),
         pytest.param("7-7", 6, False, id="below-single-point"),
         pytest.param("7-7", 8, False, id="above-single-point"),
-        pytest.param("1000000000000-1000000000005", 10**12 + 3, True, id="huge-numbers-inside"),
-        pytest.param("1000000000000-1000000000005", 10**12 + 6, False, id="huge-numbers-outside"),
+        pytest.param(
+            "1000000000000-1000000000005", 10**12 + 3, True, id="huge-numbers-inside"
+        ),
+        pytest.param(
+            "1000000000000-1000000000005", 10**12 + 6, False, id="huge-numbers-outside"
+        ),
     ],
 )
 def test_is_fresh(raw, ingredient, expected):
@@ -92,10 +98,16 @@ def test_is_fresh(raw, ingredient, expected):
         pytest.param((1, 3), (5, 6), False, id="gap"),
         pytest.param((7, 7), (8, 8), False, id="neighbouring-points"),
         pytest.param(
-            (10**12, 2 * 10**12), (2 * 10**12, 3 * 10**12), True, id="huge-sharing-an-end"
+            (10**12, 2 * 10**12),
+            (2 * 10**12, 3 * 10**12),
+            True,
+            id="huge-sharing-an-end",
         ),
         pytest.param(
-            (10**12, 2 * 10**12), (2 * 10**12 + 1, 3 * 10**12), False, id="huge-adjacent"
+            (10**12, 2 * 10**12),
+            (2 * 10**12 + 1, 3 * 10**12),
+            False,
+            id="huge-adjacent",
         ),
     ],
 )

@@ -1,6 +1,6 @@
 import pytest
 
-from day4.solution import main, accessible_papers1, accessible_papers2, get_positions
+from day4.solution import accessible_papers1, accessible_papers2, get_positions, main
 
 EXAMPLE = """\
 ..@@.@@@@.
@@ -48,7 +48,9 @@ def row(line: str) -> list[int]:
         pytest.param([1, 1, 1], [1, 1, 1], [1, 1, 1], 0, id="full-middle-row-none"),
         pytest.param([1] * 5, [1] * 5, [1] * 5, 0, id="5-wide-full-middle-row"),
         pytest.param([], [0, 1, 0], [1, 1, 1], 1, id="plus-top-arm"),
-        pytest.param([0, 1, 0], [1, 1, 1], [0, 1, 0], 2, id="plus-centre-has-exactly-4"),
+        pytest.param(
+            [0, 1, 0], [1, 1, 1], [0, 1, 0], 2, id="plus-centre-has-exactly-4"
+        ),
         pytest.param([1, 1, 0], [0, 1, 0], [0, 1, 0], 1, id="exactly-3-neighbours"),
         pytest.param([1, 1, 1], [0, 1, 0], [0, 1, 0], 0, id="exactly-4-neighbours"),
         pytest.param([1, 1, 1], [1, 0, 1], [1, 1, 1], 0, id="empty-cell-not-counted"),
@@ -72,7 +74,9 @@ def test_accessible_papers2(data, expected):
 # Before the step those cells are rolls ("@"), so the input grid is the
 # picture with x -> @, and the expected positions are where the x's are.
 REMOVAL_STEPS = [
-    (13, """\
+    (
+        13,
+        """\
 ..xx.xx@x.
 x@@.@.@.@@
 @@@@@.x.@@
@@ -83,8 +87,11 @@ x@.@@@@.@x
 x.@@@.@@@@
 .@@@@@@@@.
 x.x.@@@.x.
-"""),
-    (12, """\
+""",
+    ),
+    (
+        12,
+        """\
 .......x..
 .@@.x.x.@x
 x@@@@...@@
@@ -95,8 +102,11 @@ x.@@@@..x.
 ..@@@.@@@@
 .x@@@@@@@.
 ....@@@...
-"""),
-    (7, """\
+""",
+    ),
+    (
+        7,
+        """\
 ..........
 .x@.....x.
 .@@@@...xx
@@ -107,8 +117,11 @@ x.@@@@..x.
 ..@@@.@@@@
 ..x@@@@@@.
 ....@@@...
-"""),
-    (5, """\
+""",
+    ),
+    (
+        5,
+        """\
 ..........
 ..x.......
 .x@@@.....
@@ -119,8 +132,11 @@ x.@@@@..x.
 ..x@@.@@@x
 ...@@@@@@.
 ....@@@...
-"""),
-    (2, """\
+""",
+    ),
+    (
+        2,
+        """\
 ..........
 ..........
 ..x@@.....
@@ -131,8 +147,11 @@ x.@@@@..x.
 ...@@.@@@.
 ...@@@@@x.
 ....@@@...
-"""),
-    (1, """\
+""",
+    ),
+    (
+        1,
+        """\
 ..........
 ..........
 ...@@.....
@@ -143,8 +162,11 @@ x.@@@@..x.
 ...@@.@@@.
 ...@@@@@..
 ....@@@...
-"""),
-    (1, """\
+""",
+    ),
+    (
+        1,
+        """\
 ..........
 ..........
 ...x@.....
@@ -155,8 +177,11 @@ x.@@@@..x.
 ...@@.@@@.
 ...@@@@@..
 ....@@@...
-"""),
-    (1, """\
+""",
+    ),
+    (
+        1,
+        """\
 ..........
 ..........
 ....x.....
@@ -167,8 +192,11 @@ x.@@@@..x.
 ...@@.@@@.
 ...@@@@@..
 ....@@@...
-"""),
-    (1, """\
+""",
+    ),
+    (
+        1,
+        """\
 ..........
 ..........
 ..........
@@ -179,7 +207,8 @@ x.@@@@..x.
 ...@@.@@@.
 ...@@@@@..
 ....@@@...
-"""),
+""",
+    ),
 ]
 
 
@@ -202,7 +231,10 @@ def marked_positions(text: str) -> set:
 
 @pytest.mark.parametrize(
     "count, marked",
-    [pytest.param(count, marked, id=f"step-{i}") for i, (count, marked) in enumerate(REMOVAL_STEPS, 1)],
+    [
+        pytest.param(count, marked, id=f"step-{i}")
+        for i, (count, marked) in enumerate(REMOVAL_STEPS, 1)
+    ],
 )
 def test_get_positions(count, marked):
     grid = grid_from(marked.replace("x", "@"))

@@ -10,11 +10,11 @@ def get_the_number(current: int, action: str) -> int:
     if direction == "L":
         propose = current - number
         if propose < 0:
-            zeros += int(abs(propose/100) + 1)
+            zeros += int(abs(propose / 100) + 1)
     else:
         propose = current + number
         if propose > 99:
-            zeros += int(abs(propose/100))
+            zeros += int(abs(propose / 100))
 
     if propose == 0:
         zeros += 1
@@ -26,7 +26,6 @@ def get_the_number(current: int, action: str) -> int:
 
 def count_the_zeros(arry) -> int:
     return arry.count(0)
-
 
 
 def main(str, version=2):
@@ -42,6 +41,7 @@ def main(str, version=2):
         return result.count(0)
     else:
         return total_zeros
+
 
 def run():
     print(main(Path(__file__).with_name("input.txt").read_text()))

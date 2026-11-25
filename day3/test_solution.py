@@ -1,6 +1,6 @@
 import pytest
 
-from day3.solution import main, largest_voltage_version1, largest_voltage_version2
+from day3.solution import largest_voltage_version1, largest_voltage_version2, main
 
 EXAMPLE = """\
 987654321111111

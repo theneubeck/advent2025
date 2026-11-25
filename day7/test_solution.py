@@ -1,6 +1,6 @@
 import pytest
 
-from day7.solution import main, parse_data, split, play, build_paths
+from day7.solution import build_paths, main, parse_data, play, split
 
 EXAMPLE = """\
 .......S.......
@@ -25,7 +25,9 @@ EXAMPLE = """\
 @pytest.mark.parametrize(
     "data, expected",
     [
-        pytest.param(EXAMPLE, [list(row) for row in EXAMPLE.splitlines()], id="example"),
+        pytest.param(
+            EXAMPLE, [list(row) for row in EXAMPLE.splitlines()], id="example"
+        ),
         pytest.param("S", [["S"]], id="single-cell"),
         pytest.param(".S.", [[".", "S", "."]], id="single-row"),
         pytest.param(".\n^\n.", [["."], ["^"], ["."]], id="single-column"),
@@ -49,7 +51,6 @@ def test_parse_data_example_cells():
     assert grid[0][7] == "S"
     assert grid[2][7] == "^"
     assert grid[1] == ["."] * 15
-
 
 
 SMALL = parse_data("...\n.^.\n...")
@@ -122,7 +123,6 @@ def test_paths(data, x, y, expected):
     assert build_paths(parse_data(data))(x, y) == expected
 
 
-
 @pytest.mark.parametrize(
     "data, expected",
     [
@@ -150,7 +150,9 @@ def test_main_v1(data, expected):
         pytest.param(".S.\n...\n...\n.^.", 2, id="splitter-further-down"),
         pytest.param("..S..\n..^..\n.....\n.^...", 3, id="one-side-splits-again"),
         pytest.param("..S..\n..^..\n.....\n.^.^.", 4, id="both-sides-split-again"),
-        pytest.param("...S...\n...^...\n.......\n..^.^..\n.......\n...^...", 6, id="paths-merge"),
+        pytest.param(
+            "...S...\n...^...\n.......\n..^.^..\n.......\n...^...", 6, id="paths-merge"
+        ),
     ],
 )
 def test_main_v2(data, expected):

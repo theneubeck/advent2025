@@ -3,9 +3,7 @@ from pathlib import Path
 
 
 def solve_version1(columns: list[str]) -> int:
-    return sum(
-        [apply(numbers, op) for *numbers, op in columns]
-    )
+    return sum([apply(numbers, op) for *numbers, op in columns])
 
 
 def apply(row, operator):
@@ -20,9 +18,11 @@ def apply(row, operator):
 def solve_version2(columns: list[str]) -> int:
     return solve_version1(columns)
 
+
 parse_int = lambda x: None if x == " " else x
 
-def parse_data(data:str):
+
+def parse_data(data: str):
     rows = data.splitlines()
     operators = rows.pop().split()
     num_rows = len(rows)
@@ -40,12 +40,23 @@ def parse_data(data:str):
             rr.append(int("".join(vals)))
         else:
             rr.reverse()
-            bas.append((*rr, operators.pop(0), ))
+            bas.append(
+                (
+                    *rr,
+                    operators.pop(0),
+                )
+            )
             rr = []
     rr.reverse()
-    bas.append((*rr, operators.pop(0), ))
+    bas.append(
+        (
+            *rr,
+            operators.pop(0),
+        )
+    )
     bas.reverse()
     return bas
+
 
 def main(data: str, version=2):
     if version == 1:

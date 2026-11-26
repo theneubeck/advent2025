@@ -1,6 +1,6 @@
 import pytest
 
-from day7.solution import build_paths, main, parse_data, play, split
+from day7.solution import count_splits, main, parse_data, play
 
 EXAMPLE = """\
 .......S.......
@@ -53,11 +53,14 @@ def test_parse_data_example_cells():
     assert grid[1] == ["."] * 15
 
 
-SMALL = parse_data("...\n.^.\n...")
+ALGOS = ["recursive", "top_down", "bottom_up"]
+
+
+SMALL = parse_data(".S.\n.^.\n...")
 
 
 @pytest.mark.parametrize(
-    "x, y",
+    "y, x",
     [
         pytest.param(3, 1, id="row-past-bottom"),
         pytest.param(10, 1, id="row-far-past-bottom"),
@@ -66,21 +69,21 @@ SMALL = parse_data("...\n.^.\n...")
         pytest.param(3, 3, id="both-out-of-bounds"),
     ],
 )
-def test_split_out_of_bounds_is_zero(x, y):
-    assert split(SMALL, x, y) == 0
+def test_split_out_of_bounds_is_zero(y, x):
+    assert count_splits(SMALL, y, x) == 0
 
 
 @pytest.mark.parametrize(
-    "grid, x, y",
+    "grid, y, x",
     [
-        pytest.param(parse_data("..."), 0, 1, id="single-row-dots"),
-        pytest.param(parse_data("...\n...\n..."), 0, 1, id="all-dots"),
-        pytest.param(parse_data("...\n...\n..."), 2, 0, id="all-dots-bottom-left"),
+        pytest.param(parse_data(".S."), 0, 1, id="single-row-dots"),
+        pytest.param(parse_data(".S.\n...\n..."), 0, 1, id="all-dots"),
+        pytest.param(parse_data(".S.\n...\n..."), 2, 0, id="all-dots-bottom-left"),
         pytest.param(parse_data(".S.\n...\n..."), 1, 1, id="below-start"),
     ],
 )
-def test_split_no_splitters_is_zero(grid, x, y):
-    assert split(grid, x, y) == 0
+def test_split_no_splitters_is_zero(grid, y, x):
+    assert count_splits(grid, y, x) == 0
 
 
 def test_play_easy():
@@ -89,38 +92,28 @@ def test_play_easy():
 
 
 def test_split_on_splitter_returns_int():
-    grid = parse_data("...\n.^.\n...")
-    assert isinstance(split(grid, 1, 1), int)
+    grid = parse_data(".S.\n.^.\n...")
+    assert isinstance(count_splits(grid, 1, 1), int)
 
 
+@pytest.mark.parametrize("algo", ALGOS)
 @pytest.mark.parametrize(
-    "x",
+    "data, expected",
     [
-        pytest.param(3, id="just-past-bottom"),
-        pytest.param(10, id="far-past-bottom"),
-    ],
-)
-def test_paths_past_bottom_is_one_timeline(x):
-    assert build_paths(parse_data("...\n...\n..."))(x, 1) == 1
-
-
-@pytest.mark.parametrize(
-    "data, x, y, expected",
-    [
-        pytest.param("...", 0, 1, 1, id="last-row-dot"),
-        pytest.param("...\n...\n...", 0, 1, 1, id="column-of-dots"),
-        pytest.param("^..\n...\n...", 1, 1, 1, id="splitter-above-start-ignored"),
-        pytest.param(".^.\n...", 0, 1, 2, id="on-splitter"),
-        pytest.param("...\n.^.\n...", 0, 1, 2, id="splitter-below"),
-        pytest.param("..^..\n.....\n.^...", 0, 2, 3, id="one-side-splits-again"),
-        pytest.param("..^..\n.....\n.^.^.", 0, 2, 4, id="both-sides-split-again"),
+        pytest.param(".S.", 1, id="last-row-dot"),
+        pytest.param(".S.\n...\n...", 1, id="column-of-dots"),
+        pytest.param(".S.\n^..\n...\n...", 1, id="splitter-beside-beam"),
+        pytest.param(".S.\n.^.", 2, id="splitter-right-below-start"),
+        pytest.param(".S.\n...\n.^.\n...", 2, id="splitter-further-down"),
+        pytest.param("..S..\n..^..\n.....\n.^...", 3, id="one-side-splits-again"),
+        pytest.param("..S..\n..^..\n.....\n.^.^.", 4, id="both-sides-split-again"),
         pytest.param(
-            "...^...\n.......\n..^.^..\n.......\n...^...", 0, 3, 6, id="paths-merge"
+            "...S...\n...^...\n.......\n..^.^..\n.......\n...^...", 6, id="paths-merge"
         ),
     ],
 )
-def test_paths(data, x, y, expected):
-    assert build_paths(parse_data(data))(x, y) == expected
+def test_paths(data, expected, algo):
+    assert play(parse_data(data), version=2, algo=algo) == expected
 
 
 @pytest.mark.parametrize(
@@ -139,6 +132,7 @@ def test_main_v1(data, expected):
     assert main(data, version=1) == expected
 
 
+@pytest.mark.parametrize("algo", ALGOS)
 @pytest.mark.parametrize(
     "data, expected",
     [
@@ -155,5 +149,10 @@ def test_main_v1(data, expected):
         ),
     ],
 )
-def test_main_v2(data, expected):
-    assert main(data, version=2) == expected
+def test_main_v2(data, expected, algo):
+    assert main(data, version=2, algo=algo) == expected
+
+
+def test_unknown_algo_raises():
+    with pytest.raises(ValueError):
+        main(".S.", version=2, algo="nope")

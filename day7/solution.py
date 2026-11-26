@@ -8,23 +8,78 @@ def parse_data(data: str):
     for x, row in enumerate(rows):
         if len(grid) <= x:
             grid.append([])
-        for y, char in enumerate(row):
+        for char in row:
             grid[x].append(char)
 
     return grid
 
 
-def play(grid, version=1):
+def play(grid, version=1, algo="recursive"):
     start = grid[0].index("S")
 
-    paths = build_paths(grid)
     if version == 1:
-        return split(grid, 1, start)
-    else:
-        return paths(1, start)
+        return count_splits(grid, 1, start)
+    elif algo == "recursive":
+        return count_paths_recursive(grid, start)
+    elif algo == "top_down":
+        return count_paths_top_down(grid, start)
+    elif algo == "bottom_up":
+        return count_paths_bottom_up(grid, start)
+    raise ValueError(f"unknown algo: {algo}")
 
 
-def build_paths(grid):
+def count_paths_top_down(grid, start):
+    table = [[0 for _ in row] for row in grid]
+    table[0][start] = 1
+    for y, row in enumerate(grid):
+        if y == 0:
+            continue
+        for x, item in enumerate(row):
+            if item == ".":
+                table[y][x] = table[y][x] + table[y - 1][x]
+            elif item == "^":
+                if x + 1 < len(row):
+                    table[y][x + 1] = table[y][x + 1] + table[y - 1][x]
+                if x - 1 >= 0:
+                    table[y][x - 1] = table[y][x - 1] + table[y - 1][x]
+
+    return sum(table[-1])
+
+
+def add_cell(table, origin, dest):
+    x, y = origin
+    to_x, to_y = dest
+    if not (len(table) > to_y >= 0):
+        return
+    if not (len(table) > y >= 0):
+        return
+    if not (len(table[to_y]) > to_x >= 0):
+        return
+    if not (len(table[y]) > x >= 0):
+        return
+
+    table[to_y][to_x] = table[to_y][to_x] + table[y][x]
+
+
+def count_paths_bottom_up(grid, start):
+    table = [[0 for _ in row] for row in grid]
+    for x, _ in enumerate(table[-1]):
+        if grid[-1][x] == "^":
+            table[-1][x] = 2
+        else:
+            table[-1][x] = 1
+    for y in range(len(grid) - 1, -1, -1):
+        row = grid[y]
+        for x, item in enumerate(row):
+            if item == "." or item == "S":
+                add_cell(table, (x, y + 1), (x, y))
+            elif item == "^":
+                add_cell(table, (x - 1, y + 1), (x, y))
+                add_cell(table, (x + 1, y + 1), (x, y))
+    return table[0][start]
+
+
+def count_paths_recursive(grid, start):
 
     @lru_cache
     def paths(x, y):
@@ -39,10 +94,10 @@ def build_paths(grid):
 
         return paths(x + 1, y)
 
-    return paths
+    return paths(0, start)
 
 
-def split(grid, x, y):
+def count_splits(grid, x, y):
     if x >= len(grid):
         return 0
     if y < 0 or y > len(grid[x]) - 1:
@@ -52,15 +107,15 @@ def split(grid, x, y):
 
     elif grid[x][y] == "^":
         grid[x][y] = "|"  # mark as visited
-        return split(grid, x + 1, y + 1) + split(grid, x + 1, y - 1) + 1
+        return count_splits(grid, x + 1, y + 1) + count_splits(grid, x + 1, y - 1) + 1
 
     grid[x][y] = "|"  # mark as visited
-    return split(grid, x + 1, y)
+    return count_splits(grid, x + 1, y)
 
 
-def main(data: str, version=2):
+def main(data: str, version=2, algo="recursive"):
     grid = parse_data(data)
-    return play(grid, version)
+    return play(grid, version, algo)
 
 
 def run():
